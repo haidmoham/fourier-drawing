@@ -3,13 +3,17 @@ type VisualColor = Readonly<{
   three: number;
 }>;
 
+/** The source rests as cool graphite. Fourier state carries the active color. */
 export const VISUAL_PALETTE = {
-  axisX: { css: "#ff7f6e", three: 0xff7f6e },
-  axisY: { css: "#7de08a", three: 0x7de08a },
-  axisZ: { css: "#73a7ff", three: 0x73a7ff },
-  closure: { css: "#f5d76e", three: 0xf5d76e },
-  halo: { css: "#37f6ff", three: 0x37f6ff },
-  raw: { css: "#f0c27b", three: 0xf0c27b },
-  reconstruction: { css: "#6ed8ce", three: 0x6ed8ce },
-  residual: { css: "#ff9fc5", three: 0xff9fc5 },
+  axisX: { css: "#c94e43", three: 0xc94e43 },
+  axisY: { css: "#378946", three: 0x378946 },
+  axisZ: { css: "#3f6fc2", three: 0x3f6fc2 },
+  closure: { css: "#8f7600", three: 0x8f7600 },
+  grid: { css: "#8a9a9d", three: 0x8a9a9d },
+  gridAxis: { css: "#5c777d", three: 0x5c777d },
+  halo: { css: "#68c8c9", three: 0x68c8c9 },
+  raw: { css: "#535d60", three: 0x535d60 },
+  reconstruction: { css: "#147d82", three: 0x147d82 },
+  residual: { css: "#b73d6d", three: 0xb73d6d },
+  sourceUnderlay: { css: "#aeb6b5", three: 0xaeb6b5 },
 } as const satisfies Record<string, VisualColor>;

@@ -11,7 +11,7 @@ export class HarmonicPlayback {
   private isAuto = false;
   private automaticStepStartedAt = performance.now();
 
-  public constructor(private readonly automaticStepDuration = 900) {}
+  public constructor(private readonly automaticStepDuration = 1_800) {}
 
   public configure(maximum: number, preferredPairs = this.currentPairs()): void {
     this.steps = powerOfTwoSteps(maximum);
