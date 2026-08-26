@@ -48,6 +48,13 @@ export class HarmonicPlayback {
     this.automaticStepStartedAt = now;
   }
 
+  /** Start a new visible playback sequence, regardless of previous playback state. */
+  public playFromBeginning(now: number): void {
+    this.stepIndex = Math.min(1, this.steps.length - 1);
+    this.isAuto = this.steps.length > 1;
+    this.automaticStepStartedAt = now;
+  }
+
   public stopAuto(): void {
     this.isAuto = false;
   }

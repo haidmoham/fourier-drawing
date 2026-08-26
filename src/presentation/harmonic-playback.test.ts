@@ -30,4 +30,20 @@ describe("harmonic playback", () => {
     expect(playback.tick(2_800)).toBe(true);
     expect(playback.snapshot().harmonicPairs).toBe(2);
   });
+
+  it("restarts a visible sequence from one play action", () => {
+    const playback = new HarmonicPlayback(1_800);
+    playback.reset(16, 0);
+
+    playback.playFromBeginning(1_000);
+    expect(playback.snapshot()).toMatchObject({ harmonicPairs: 1, isAuto: true });
+
+    expect(playback.tick(2_800)).toBe(true);
+    expect(playback.snapshot().harmonicPairs).toBe(2);
+
+    playback.playFromBeginning(3_000);
+    expect(playback.snapshot()).toMatchObject({ harmonicPairs: 1, isAuto: true });
+    expect(playback.tick(4_799)).toBe(false);
+    expect(playback.tick(4_800)).toBe(true);
+  });
 });

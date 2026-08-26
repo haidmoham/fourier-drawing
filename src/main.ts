@@ -102,6 +102,7 @@ const touchCameraGesture = new TouchCameraGesture();
 let pendingTouchId: number | null = null;
 let pendingTouchStart: TouchPoint | null = null;
 let previousPinchDistance: number | null = null;
+let lastMobilePlayTouchAt = Number.NEGATIVE_INFINITY;
 
 function usesCoarsePointer(): boolean {
   return window.matchMedia("(pointer: coarse)").matches;
@@ -260,19 +261,35 @@ function toggleInspector(): void {
   setInspectorExpanded(inspectorToggle.ariaExpanded !== "true");
 }
 
-function revealInspectorAndStartPlayback(): void {
-  setInspectorExpanded(true);
-  if (!playback.snapshot().isAuto) {
-    startAutomaticPlayback(true);
-  }
-  requestAnimationFrame(() => inspector.scrollIntoView({ behavior: "smooth", block: "start" }));
-}
-
-function handleMobilePlay(): void {
+function playMobileSequence(): void {
   if (state !== "HARMONICS" || !analysis) {
     return;
   }
-  revealInspectorAndStartPlayback();
+  if (!prepareAutomaticPlayback()) {
+    return;
+  }
+  const startedAt = performance.now();
+  playback.playFromBeginning(startedAt);
+  fourierScene.restartReconstructionMotion(startedAt);
+  harmonicEnvelope.restartMotion(startedAt);
+  setInspectorExpanded(true);
+  applyPlaybackState();
+}
+
+function handleMobilePlayPointerUp(event: PointerEvent): void {
+  if (event.pointerType !== "touch") {
+    return;
+  }
+  event.preventDefault();
+  lastMobilePlayTouchAt = performance.now();
+  playMobileSequence();
+}
+
+function handleMobilePlayClick(): void {
+  if (performance.now() - lastMobilePlayTouchAt < 700) {
+    return;
+  }
+  playMobileSequence();
 }
 
 function cancelTouchInteraction(): void {
@@ -653,7 +670,8 @@ canvas.addEventListener("wheel", zoomCamera, { passive: false });
 canvas.addEventListener("auxclick", preventMiddleClick);
 resetViewButton.addEventListener("click", resetView);
 inspectorToggle.addEventListener("click", toggleInspector);
-mobilePlay.addEventListener("click", handleMobilePlay);
+mobilePlay.addEventListener("pointerup", handleMobilePlayPointerUp);
+mobilePlay.addEventListener("click", handleMobilePlayClick);
 harmonicSlider.addEventListener("input", selectHarmonics);
 previousStepButton.addEventListener("click", selectPreviousHarmonics);
 nextStepButton.addEventListener("click", selectNextHarmonics);
@@ -681,7 +699,8 @@ function cleanup(): void {
   canvas.removeEventListener("auxclick", preventMiddleClick);
   resetViewButton.removeEventListener("click", resetView);
   inspectorToggle.removeEventListener("click", toggleInspector);
-  mobilePlay.removeEventListener("click", handleMobilePlay);
+  mobilePlay.removeEventListener("pointerup", handleMobilePlayPointerUp);
+  mobilePlay.removeEventListener("click", handleMobilePlayClick);
   harmonicSlider.removeEventListener("input", selectHarmonics);
   previousStepButton.removeEventListener("click", selectPreviousHarmonics);
   nextStepButton.removeEventListener("click", selectNextHarmonics);

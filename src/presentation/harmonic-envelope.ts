@@ -27,6 +27,7 @@ type EnvelopeSample = Readonly<{
 
 export class HarmonicEnvelope {
   private hasAnalysis = false;
+  private motionStartedAt = 0;
 
   private constructor(private readonly elements: EnvelopeElements) {
     const formula = String.raw`\widehat{\mathbf p}_M(t)=\mathbf c_0+\color{${VISUAL_PALETTE.reconstruction.css}}{\underbrace{\sum\Re(\mathbf c_k)\cos(2\pi kt)}_{\mathbf C_M(t)}}+\color{${VISUAL_PALETTE.raw.css}}{\underbrace{-\sum\Im(\mathbf c_k)\sin(2\pi kt)}_{\mathbf S_M(t)}}`;
@@ -69,11 +70,15 @@ export class HarmonicEnvelope {
     this.elements.status.textContent = harmonicPairs === 0 ? "M = 0 · dc only" : `M = ${harmonicPairs}`;
   }
 
+  public restartMotion(now: number): void {
+    this.motionStartedAt = now;
+  }
+
   public render(timestampMs: number): void {
     if (!this.hasAnalysis || !this.elements.details.open) {
       return;
     }
-    const x = 10 + harmonicPhaseAt(timestampMs) * (VIEWBOX_WIDTH - 20);
+    const x = 10 + harmonicPhaseAt(timestampMs - this.motionStartedAt) * (VIEWBOX_WIDTH - 20);
     this.elements.phaseDelta.setAttribute("transform", `translate(${x.toFixed(2)} 0)`);
   }
 }

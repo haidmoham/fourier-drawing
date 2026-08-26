@@ -73,6 +73,7 @@ export class FourierScene {
   private reconstructionCore: Line2 | null = null;
   private reconstructionPoints: readonly Vec3[] = [];
   private reconstructionVisible = false;
+  private reconstructionMotionStartedAt = 0;
 
   public constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -166,6 +167,10 @@ export class FourierScene {
     this.cursor.visible = false;
   }
 
+  public restartReconstructionMotion(now: number): void {
+    this.reconstructionMotionStartedAt = now;
+  }
+
   public resize(): void {
     const bounds = this.mount.getBoundingClientRect();
     const width = Math.max(1, bounds.width);
@@ -210,7 +215,7 @@ export class FourierScene {
       this.probe.setVisible(false);
       return null;
     }
-    const phase = harmonicPhaseAt(now);
+    const phase = harmonicPhaseAt(now - this.reconstructionMotionStartedAt);
     const tipPosition = pointOnLoop(this.reconstructionPoints, phase);
     this.probe.setPosition(tipPosition);
     this.probe.setVisible(true);
