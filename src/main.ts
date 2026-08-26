@@ -36,15 +36,15 @@ const mathDetailsElement = document.querySelector<HTMLDetailsElement>(".math-det
 const resetViewElement = document.querySelector<HTMLButtonElement>("#reset-view");
 const inspectorElement = document.querySelector<HTMLElement>(".inspector");
 const inspectorToggleElement = document.querySelector<HTMLButtonElement>(".inspector-toggle");
-const drawCtaElements = [...document.querySelectorAll<HTMLButtonElement>("[data-draw-cta]")];
+const mobileStartElement = document.querySelector<HTMLButtonElement>("#mobile-start");
 const drawingInvitationElements = [...document.querySelectorAll<HTMLButtonElement>("[data-draw-invitation]")];
 
 if (!canvasElement || !resetButtonElement || !hintElement || !inputStateElement || !sourceSamplesElement
   || !resampledCountElement || !harmonicCountElement || !closureGapElement || !rmsErrorElement
   || !harmonicSliderElement || !previousStepElement || !nextStepElement || !autoPlaybackElement
   || !resolutionSliderElement || !resolutionCountElement || !mathDetailsElement || !resetViewElement
-  || !inspectorElement || !inspectorToggleElement
-  || drawCtaElements.length === 0 || drawingInvitationElements.length === 0) {
+  || !inspectorElement || !inspectorToggleElement || !mobileStartElement
+  || drawingInvitationElements.length === 0) {
   throw new Error("The Fourier instrument could not be initialized.");
 }
 
@@ -67,6 +67,7 @@ const mathDetails = mathDetailsElement;
 const resetViewButton = resetViewElement;
 const inspector = inspectorElement;
 const inspectorToggle = inspectorToggleElement;
+const mobileStart = mobileStartElement;
 const liveMathPanel = LiveMathPanel.from(document);
 const harmonicEnvelope = HarmonicEnvelope.from(document);
 const mountElement = canvas.parentElement;
@@ -249,10 +250,25 @@ function beginDrawing(event: PointerEvent): void {
   updateInspector();
 }
 
-function toggleInspector(): void {
-  const expanded = inspectorToggle.ariaExpanded !== "true";
+function setInspectorExpanded(expanded: boolean): void {
   inspectorToggle.ariaExpanded = String(expanded);
   inspector.dataset.mobileExpanded = String(expanded);
+}
+
+function toggleInspector(): void {
+  setInspectorExpanded(inspectorToggle.ariaExpanded !== "true");
+}
+
+function handleMobileStart(): void {
+  if (state !== "HARMONICS" || !analysis) {
+    inviteDrawing();
+    return;
+  }
+  setInspectorExpanded(true);
+  if (!playback.snapshot().isAuto) {
+    toggleAutomaticPlayback();
+  }
+  requestAnimationFrame(() => inspector.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
 
 function cancelTouchInteraction(): void {
@@ -562,6 +578,7 @@ function reset(): void {
   currentPairs = 0;
   playback.reset();
   mathDetails.open = false;
+  setInspectorExpanded(false);
   showDrawingInvitation();
   resetInteractionInstructions();
   updateAnalysisFromSamples();
@@ -617,12 +634,13 @@ canvas.addEventListener("wheel", zoomCamera, { passive: false });
 canvas.addEventListener("auxclick", preventMiddleClick);
 resetViewButton.addEventListener("click", resetView);
 inspectorToggle.addEventListener("click", toggleInspector);
+mobileStart.addEventListener("click", handleMobileStart);
 harmonicSlider.addEventListener("input", selectHarmonics);
 previousStepButton.addEventListener("click", selectPreviousHarmonics);
 nextStepButton.addEventListener("click", selectNextHarmonics);
 autoPlaybackButton.addEventListener("click", toggleAutomaticPlayback);
 resolutionSlider.addEventListener("input", selectPeriodicResolution);
-for (const callToAction of drawCtaElements) {
+for (const callToAction of drawingInvitationElements) {
   callToAction.addEventListener("click", inviteDrawing);
 }
 resetButton.addEventListener("click", reset);
@@ -644,12 +662,13 @@ function cleanup(): void {
   canvas.removeEventListener("auxclick", preventMiddleClick);
   resetViewButton.removeEventListener("click", resetView);
   inspectorToggle.removeEventListener("click", toggleInspector);
+  mobileStart.removeEventListener("click", handleMobileStart);
   harmonicSlider.removeEventListener("input", selectHarmonics);
   previousStepButton.removeEventListener("click", selectPreviousHarmonics);
   nextStepButton.removeEventListener("click", selectNextHarmonics);
   autoPlaybackButton.removeEventListener("click", toggleAutomaticPlayback);
   resolutionSlider.removeEventListener("input", selectPeriodicResolution);
-  for (const callToAction of drawCtaElements) {
+  for (const callToAction of drawingInvitationElements) {
     callToAction.removeEventListener("click", inviteDrawing);
   }
   resetButton.removeEventListener("click", reset);
