@@ -4,6 +4,7 @@ import type { ClosureBreakdown, RmsErrorBreakdown } from "../domain";
 import { VISUAL_PALETTE } from "./visual-palette";
 
 type LiveMathElements = Readonly<{
+  details: HTMLDetailsElement;
   periodicFormula: HTMLElement;
   closureFormula: HTMLElement;
   rmsFormula: HTMLElement;
@@ -23,7 +24,14 @@ type LiveMathElements = Readonly<{
   rmsReferenceX: HTMLElement;
   rmsReferenceY: HTMLElement;
   rmsReferenceZ: HTMLElement;
+  parameterButtons: ReadonlyArray<Readonly<{
+    element: HTMLButtonElement;
+    target: MathDrilldownTarget;
+  }>>;
+  derivations: Readonly<Record<MathDrilldownTarget, HTMLElement>>;
 }>;
+
+type MathDrilldownTarget = "periodic" | "closure" | "rms";
 
 export type LiveMathSnapshot = Readonly<{
   hasAnalysis: boolean;
@@ -37,11 +45,19 @@ export class LiveMathPanel {
   private renderedPeriodicTex = "";
   private renderedClosureTex = "";
   private renderedRmsTex = "";
+  private readonly cleanupCallbacks: Array<() => void> = [];
+  private activeDerivation: HTMLElement | null = null;
+  private activeTarget: MathDrilldownTarget | null = null;
+  private highlightTimer: number | null = null;
+  private disposed = false;
 
-  private constructor(private readonly elements: LiveMathElements) {}
+  private constructor(private readonly elements: LiveMathElements) {
+    this.bindDrilldownControls();
+  }
 
   public static from(root: ParentNode): LiveMathPanel {
     return new LiveMathPanel({
+      details: requiredElement<HTMLDetailsElement>(root, "#math-details"),
       periodicFormula: requiredElement(root, "#periodic-formula"),
       closureFormula: requiredElement(root, "#closure-formula"),
       rmsFormula: requiredElement(root, "#rms-formula"),
@@ -61,7 +77,31 @@ export class LiveMathPanel {
       rmsReferenceX: requiredElement(root, "#rms-reference-x"),
       rmsReferenceY: requiredElement(root, "#rms-reference-y"),
       rmsReferenceZ: requiredElement(root, "#rms-reference-z"),
+      parameterButtons: [
+        { element: requiredElement<HTMLButtonElement>(root, ".harmonic-parameter"), target: "periodic" },
+        { element: requiredElement<HTMLButtonElement>(root, ".resolution-parameter"), target: "periodic" },
+        { element: requiredElement<HTMLButtonElement>(root, '[data-math-target="closure"]'), target: "closure" },
+        { element: requiredElement<HTMLButtonElement>(root, '[data-math-target="rms"]'), target: "rms" },
+      ],
+      derivations: {
+        periodic: requiredElement(root, '[data-math-derivation="periodic"]'),
+        closure: requiredElement(root, '[data-math-derivation="closure"]'),
+        rms: requiredElement(root, '[data-math-derivation="rms"]'),
+      },
     });
+  }
+
+  /** Remove the panel's DOM listeners and any pending highlight cleanup. */
+  public dispose(): void {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    this.clearHighlight();
+    for (const cleanup of this.cleanupCallbacks) {
+      cleanup();
+    }
+    this.cleanupCallbacks.length = 0;
   }
 
   public render(snapshot: LiveMathSnapshot): void {
@@ -100,10 +140,81 @@ export class LiveMathPanel {
     setChangingValue(this.elements.rmsReferenceY, error ? formatCalculationValue(error.squaredReferenceByAxis.y) : "—");
     setChangingValue(this.elements.rmsReferenceZ, error ? formatCalculationValue(error.squaredReferenceByAxis.z) : "—");
   }
+
+  private bindDrilldownControls(): void {
+    for (const { element, target } of this.elements.parameterButtons) {
+      const handleClick = (): void => this.revealDerivation(target);
+      element.addEventListener("click", handleClick);
+      this.cleanupCallbacks.push(() => element.removeEventListener("click", handleClick));
+    }
+
+    const handleDetailsToggle = (): void => {
+      if (!this.elements.details.open) {
+        this.activeTarget = null;
+        this.clearHighlight();
+      }
+      this.syncDrilldownState();
+    };
+    this.elements.details.addEventListener("toggle", handleDetailsToggle);
+    this.cleanupCallbacks.push(() => this.elements.details.removeEventListener("toggle", handleDetailsToggle));
+    this.syncDrilldownState();
+  }
+
+  private syncDrilldownState(): void {
+    const expanded = String(this.elements.details.open);
+    for (const { element, target } of this.elements.parameterButtons) {
+      element.setAttribute("aria-expanded", expanded);
+      if (!this.elements.details.open || this.activeTarget === null) {
+        delete element.dataset.drilldownState;
+      } else {
+        element.dataset.drilldownState = target === this.activeTarget ? "active" : "muted";
+      }
+    }
+    if (this.elements.details.open && this.activeTarget !== null) {
+      this.elements.details.dataset.activeDerivation = this.activeTarget;
+    } else {
+      delete this.elements.details.dataset.activeDerivation;
+    }
+  }
+
+  private revealDerivation(target: MathDrilldownTarget): void {
+    if (this.disposed) {
+      return;
+    }
+
+    this.activeTarget = target;
+    this.elements.details.open = true;
+    this.syncDrilldownState();
+
+    const derivation = this.elements.derivations[target];
+    this.clearHighlight();
+    // Reading layout between class changes restarts the short highlight animation
+    // when a user activates the same chip twice.
+    void derivation.offsetWidth;
+    derivation.classList.add("is-drilldown-target");
+    this.activeDerivation = derivation;
+    derivation.focus({ preventScroll: false });
+    this.highlightTimer = window.setTimeout(() => {
+      if (this.activeDerivation === derivation) {
+        derivation.classList.remove("is-drilldown-target");
+        this.activeDerivation = null;
+        this.highlightTimer = null;
+      }
+    }, 1400);
+  }
+
+  private clearHighlight(): void {
+    if (this.highlightTimer !== null) {
+      window.clearTimeout(this.highlightTimer);
+      this.highlightTimer = null;
+    }
+    this.activeDerivation?.classList.remove("is-drilldown-target");
+    this.activeDerivation = null;
+  }
 }
 
-function requiredElement(root: ParentNode, selector: string): HTMLElement {
-  const element = root.querySelector<HTMLElement>(selector);
+function requiredElement<T extends HTMLElement>(root: ParentNode, selector: string): T {
+  const element = root.querySelector<T>(selector);
   if (!element) {
     throw new Error(`The live math panel is missing ${selector}.`);
   }

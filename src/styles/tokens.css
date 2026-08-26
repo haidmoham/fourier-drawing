@@ -1,11 +1,11 @@
 :root {
-  --color-axis-x: #ff7f6e;
-  --color-axis-y: #7de08a;
-  --color-axis-z: #73a7ff;
-  --color-closure: #f5d76e;
-  --color-raw: #f0c27b;
-  --color-reconstruction: #6ed8ce;
-  --color-residual: #ff9fc5;
-  --color-surface: #080d12;
-  --color-text: #e8ede9;
+  --color-axis-x: #c94e43;
+  --color-axis-y: #378946;
+  --color-axis-z: #3f6fc2;
+  --color-closure: #8f7600;
+  --color-raw: #535d60;
+  --color-reconstruction: #147d82;
+  --color-residual: #b73d6d;
+  --color-surface: #f3f1e9;
+  --color-text: #17282d;
 }

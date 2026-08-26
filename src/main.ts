@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import "./style.css";
 import { FourierScene } from "./presentation/fourier-scene";
+import { HarmonicEnvelope } from "./presentation/harmonic-envelope";
 import { HarmonicPlayback } from "./presentation/harmonic-playback";
 import { formatCalculationValue, LiveMathPanel } from "./presentation/live-math-panel";
 import { OrbitCameraController } from "./presentation/orbit-camera-controller";
@@ -57,6 +58,7 @@ const resolutionSlider = resolutionSliderElement;
 const resolutionCount = resolutionCountElement;
 const mathDetails = mathDetailsElement;
 const liveMathPanel = LiveMathPanel.from(document);
+const harmonicEnvelope = HarmonicEnvelope.from(document);
 const mountElement = canvas.parentElement;
 if (!mountElement) {
   throw new Error("The Fourier instrument has no mount element.");
@@ -68,6 +70,9 @@ const camera = fourierScene.camera;
 const orbitCamera = new OrbitCameraController(camera, new THREE.Vector3(7.4, 6.2, 9.2));
 
 type InstrumentState = "READY" | "DRAWING" | "HARMONICS";
+
+const MINIMUM_AUTO_HARMONIC_PAIRS = 128;
+const MINIMUM_AUTO_SAMPLE_COUNT = MINIMUM_AUTO_HARMONIC_PAIRS * 2;
 
 let samples: CurveSample[] = [];
 let analysis: FourierAnalysis | null = null;
@@ -141,10 +146,12 @@ function updateRawPath(): void {
 function updateReconstruction(): void {
   if (!analysis || state !== "HARMONICS") {
     fourierScene.updateReconstruction(null);
+    harmonicEnvelope.update(null, 0);
     return;
   }
   const points = reconstructCurve(analysis, currentPairs, analysis.resampled.length);
   fourierScene.updateReconstruction(points);
+  harmonicEnvelope.update(analysis, currentPairs);
 }
 
 function updateAnalysisFromSamples(): void {
@@ -338,6 +345,12 @@ function toggleAutomaticPlayback(): void {
   if (state !== "HARMONICS" || !analysis) {
     return;
   }
+  const isStartingAuto = !playback.snapshot().isAuto;
+  if (isStartingAuto && harmonicMaximum() < MINIMUM_AUTO_HARMONIC_PAIRS) {
+    periodicResolution = Math.max(periodicResolution, MINIMUM_AUTO_SAMPLE_COUNT);
+    resolutionSlider.value = String(Math.log2(periodicResolution));
+    updateAnalysisFromSamples();
+  }
   playback.toggleAuto(performance.now());
   syncHarmonicControl();
   updateInspector();
@@ -380,7 +393,8 @@ function updateAutomaticHarmonics(now: number): void {
 function animate(now: number): void {
   raf = requestAnimationFrame(animate);
   updateAutomaticHarmonics(now);
-  fourierScene.render();
+  harmonicEnvelope.render(now);
+  fourierScene.render(now);
 }
 
 canvas.addEventListener("pointerdown", handlePointerDown);
@@ -421,6 +435,7 @@ function cleanup(): void {
   }
   resetButton.removeEventListener("click", reset);
   window.removeEventListener("resize", resize);
+  liveMathPanel.dispose();
   fourierScene.dispose();
 }
 
