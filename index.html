@@ -10,7 +10,7 @@
     <main class="app-shell">
       <header class="toolbar">
         <div>
-          <button class="eyebrow draw-cta" type="button" data-draw-cta>Start drawing →</button>
+          <button class="eyebrow draw-cta" type="button" data-draw-cta data-draw-invitation>Start drawing →</button>
           <h1>fourier etch-a-sketch</h1>
           <p class="subtitle">mathematics as a toy 🤓</p>
         </div>
@@ -36,7 +36,7 @@
             </details>
           </div>
           <div class="drawing-invitation">
-            <button class="canvas-cta draw-cta" type="button" data-draw-cta>Start drawing →</button>
+            <button class="canvas-cta draw-cta" type="button" data-draw-cta data-draw-invitation>Start drawing →</button>
             <div class="gesture-primer" aria-label="gesture guide">
               <div class="gesture-guide-content">
                 <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3-3m-3 3-3-3M8 7.5V6a2 2 0 0 1 4 0v1.5M16 7.5V6a2 2 0 0 0-4 0v1.5"></path></svg><span>one finger draws</span></div>
@@ -78,9 +78,13 @@
           <p id="hint" class="hint">Press and drag to draw · wheel zooms · middle-drag pivots</p>
         </div>
         <button class="mobile-start draw-cta" type="button" data-draw-cta>Start</button>
-        <aside class="inspector" aria-label="Curve inspector">
-          <div class="inspector-title"><span>Curve inspector</span><span class="live-dot">● LIVE</span></div>
-          <dl class="metrics">
+        <aside class="inspector" aria-label="Curve inspector" data-mobile-expanded="false">
+          <button class="inspector-toggle" type="button" aria-expanded="false" aria-controls="inspector-content">
+            <span>Curve inspector</span><span class="inspector-toggle-meta"><span class="live-dot">● LIVE</span><span class="inspector-chevron" aria-hidden="true">⌄</span></span>
+          </button>
+          <div id="inspector-content" class="inspector-content">
+            <div class="inspector-title"><span>Curve inspector</span><span class="live-dot">● LIVE</span></div>
+            <dl class="metrics">
             <div class="metric"><dt>Input state</dt><dd id="input-state" class="parameter-value">READY</dd></div>
             <div class="metric"><dt>Source samples</dt><dd id="source-samples" class="parameter-value">0</dd></div>
             <div class="metric"><dt>Resampled count</dt><dd id="resampled-count" class="parameter-value">0</dd></div>
@@ -105,8 +109,8 @@
             </div>
             <div class="metric"><dt>Closure gap</dt><dd id="closure-gap" class="parameter-value closure-value">—</dd></div>
             <div class="metric"><dt><a class="term-link" href="https://en.wikipedia.org/wiki/Root_mean_square_deviation#Normalized_root-mean-square_deviation" target="_blank" rel="noreferrer">normalized rms error</a></dt><dd id="rms-error" class="parameter-value error-value">—</dd></div>
-          </dl>
-          <section class="math-panel" aria-labelledby="math-panel-title">
+            </dl>
+            <section class="math-panel" aria-labelledby="math-panel-title">
             <h2 id="math-panel-title">Live mathematics</h2>
             <div class="math-color-key" aria-label="Mathematical color key">
               <span class="raw-object">p · raw</span>
@@ -213,8 +217,9 @@
                 </section>
               </div>
             </details>
-          </section>
-          <p class="note">use the arrows or slider to step through harmonic pairs in powers of two. auto mode reaches at least 128 pairs, then loops. use the wheel to zoom and middle-drag to orbit.</p>
+            </section>
+            <p class="note">use the arrows or slider to step through harmonic pairs in powers of two. auto mode reaches at least 128 pairs, then loops. use the wheel to zoom and middle-drag to orbit.</p>
+          </div>
         </aside>
       </section>
     </main>

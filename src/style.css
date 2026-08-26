@@ -75,6 +75,7 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
 .harmonic-phase-delta path { fill: rgba(255,255,255,.36); stroke: var(--color-reconstruction); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 .harmonic-phase-delta text { fill: var(--color-reconstruction); font: 600 12px "DM Mono",monospace; text-anchor: middle; }
 .inspector { align-self: start; border: 1px solid #c5cfcc; border-radius: .65rem; background: rgba(251,250,246,.9); overflow: hidden; box-shadow: 0 .8rem 2rem rgba(61,79,78,.06); }
+.inspector-toggle { display: none; }
 .inspector-title { display: flex; justify-content: space-between; padding: .85rem .9rem; border-bottom: 1px solid #cbd4d1; color: #263b40; font-size: .78rem; font-weight: 600; }
 .live-dot { color: var(--color-reconstruction); font: .62rem "DM Mono",monospace; letter-spacing: .1em; }
 .metrics { margin: 0; padding: .3rem .9rem .65rem; }
@@ -122,7 +123,7 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
 .error-parameter { color: var(--color-residual); }
 .parameter-chip strong.value-changed { animation: parameter-pop .34s ease-out; }
 .math-details { margin-top: .55rem; border-top: 1px solid rgba(57,76,81,.18); }
-.math-details summary { padding: .55rem 0 .1rem; color: #687a7e; cursor: pointer; font: 500 .58rem "DM Mono",monospace; letter-spacing: .04em; text-transform: uppercase; }
+.math-details summary { display: flex; align-items: center; min-height: 2.75rem; padding: .55rem 0 .1rem; color: #687a7e; cursor: pointer; font: 500 .58rem "DM Mono",monospace; letter-spacing: .04em; text-transform: uppercase; }
 .math-details summary:hover,.math-details summary:focus-visible,.math-details[open] summary { color: #30494e; }
 .math-detail-content { padding-top: .12rem; }
 .math-derivation { --derivation-color: var(--color-reconstruction); margin: .18rem -.2rem 0; padding: .08rem .2rem .18rem; border: 1px solid transparent; border-radius: .3rem; outline: none; scroll-margin-block: .8rem; transition: filter .18s ease,opacity .18s ease; }
@@ -177,17 +178,24 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
 .resource-list a:hover,.resource-list a:focus-visible,.video-list a:hover,.video-list a:focus-visible { border-color: var(--color-reconstruction); color: #0d6267; background: rgba(228,240,237,.7); outline: none; transform: translateY(-1px); }
 @media (max-width: 760px) {
   .workspace { grid-template-columns: 1fr; min-height: 0; }
-  .drawing-area,canvas { min-height: clamp(22rem,55svh,26rem); }
+  .drawing-area,canvas { min-height: clamp(24rem,62svh,32rem); }
   .mobile-start { display: block; width: 100%; min-height: 3.75rem; font-size: 1rem; }
   .inspector { display: block; }
-  .inspector-title { border-bottom: 1px solid #cbd4d1; }
+  .inspector-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 3.25rem; padding: .75rem .9rem; border: 0; border-radius: 0; color: #263b40; background: transparent; box-shadow: none; font-size: .78rem; font-weight: 600; text-align: left; }
+  .inspector-toggle:hover,.inspector-toggle:focus-visible { border-color: transparent; background: rgba(228,240,237,.72); transform: none; }
+  .inspector-toggle-meta { display: flex; align-items: center; gap: .7rem; }
+  .inspector-chevron { color: var(--color-reconstruction); font: 700 1rem/1 "DM Mono",monospace; transition: transform .18s ease; }
+  .inspector[data-mobile-expanded="true"] .inspector-chevron { transform: rotate(180deg); }
+  .inspector-content { display: none; border-top: 1px solid #cbd4d1; }
+  .inspector[data-mobile-expanded="true"] .inspector-content { display: block; }
+  .inspector-title { display: none; }
 }
 @media (max-width: 480px) {
   .app-shell { padding: max(.85rem,env(safe-area-inset-top)) max(.85rem,env(safe-area-inset-right)) max(.85rem,env(safe-area-inset-bottom)) max(.85rem,env(safe-area-inset-left)); gap: .9rem; }
   .toolbar { align-items: center; gap: .65rem; }
   .subtitle { display: block; max-width: 13rem; font-size: .78rem; line-height: 1.35; }
   .toolbar .eyebrow.draw-cta { display: none; }
-  .drawing-area,canvas { min-height: clamp(20rem,52svh,23rem); }
+  .drawing-area,canvas { min-height: clamp(24rem,62svh,30rem); }
   .drawing-invitation .canvas-cta { width: min(calc(100% - 2rem),18rem); }
   .gesture-primer .gesture-guide-content { grid-template-columns: 1fr; width: min(14rem,calc(100vw - 3rem)); }
   .legend { flex-direction: column; gap: .3rem; }

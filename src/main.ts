@@ -34,13 +34,17 @@ const resolutionSliderElement = document.querySelector<HTMLInputElement>("#resol
 const resolutionCountElement = document.querySelector<HTMLOutputElement>("#resolution-count");
 const mathDetailsElement = document.querySelector<HTMLDetailsElement>(".math-details");
 const resetViewElement = document.querySelector<HTMLButtonElement>("#reset-view");
+const inspectorElement = document.querySelector<HTMLElement>(".inspector");
+const inspectorToggleElement = document.querySelector<HTMLButtonElement>(".inspector-toggle");
 const drawCtaElements = [...document.querySelectorAll<HTMLButtonElement>("[data-draw-cta]")];
+const drawingInvitationElements = [...document.querySelectorAll<HTMLButtonElement>("[data-draw-invitation]")];
 
 if (!canvasElement || !resetButtonElement || !hintElement || !inputStateElement || !sourceSamplesElement
   || !resampledCountElement || !harmonicCountElement || !closureGapElement || !rmsErrorElement
   || !harmonicSliderElement || !previousStepElement || !nextStepElement || !autoPlaybackElement
   || !resolutionSliderElement || !resolutionCountElement || !mathDetailsElement || !resetViewElement
-  || drawCtaElements.length === 0) {
+  || !inspectorElement || !inspectorToggleElement
+  || drawCtaElements.length === 0 || drawingInvitationElements.length === 0) {
   throw new Error("The Fourier instrument could not be initialized.");
 }
 
@@ -61,6 +65,8 @@ const resolutionSlider = resolutionSliderElement;
 const resolutionCount = resolutionCountElement;
 const mathDetails = mathDetailsElement;
 const resetViewButton = resetViewElement;
+const inspector = inspectorElement;
+const inspectorToggle = inspectorToggleElement;
 const liveMathPanel = LiveMathPanel.from(document);
 const harmonicEnvelope = HarmonicEnvelope.from(document);
 const mountElement = canvas.parentElement;
@@ -78,6 +84,8 @@ type TouchPoint = Readonly<{ clientX: number; clientY: number }>;
 
 const MINIMUM_AUTO_HARMONIC_PAIRS = 128;
 const MINIMUM_AUTO_SAMPLE_COUNT = MINIMUM_AUTO_HARMONIC_PAIRS * 2;
+const INITIAL_TOUCH_DRAW_DISTANCE = 6;
+const REDRAW_TOUCH_DISTANCE = 12;
 
 let samples: CurveSample[] = [];
 let analysis: FourierAnalysis | null = null;
@@ -106,6 +114,13 @@ function resetInteractionInstructions(): void {
   canvas.ariaLabel = touchInstructions
     ? "one finger draws. two fingers orbit. pinch zooms."
     : "Press and drag to draw a curve. Use the mouse wheel to zoom. Middle-drag to orbit around the origin.";
+}
+
+function touchDrawDistance(): number {
+  const explicitlyInvited = canvas.dataset.awaitingDraw === "true";
+  return state === "HARMONICS" && !explicitlyInvited
+    ? REDRAW_TOUCH_DISTANCE
+    : INITIAL_TOUCH_DRAW_DISTANCE;
 }
 
 function harmonicMaximum(): number {
@@ -197,14 +212,14 @@ function appendPointerBatch(event: PointerEvent): void {
 }
 
 function showDrawingInvitation(): void {
-  for (const callToAction of drawCtaElements) {
+  for (const callToAction of drawingInvitationElements) {
     callToAction.hidden = false;
   }
   delete canvas.dataset.awaitingDraw;
 }
 
 function dismissDrawingInvitation(): void {
-  for (const callToAction of drawCtaElements) {
+  for (const callToAction of drawingInvitationElements) {
     callToAction.hidden = true;
   }
   delete canvas.dataset.awaitingDraw;
@@ -232,6 +247,12 @@ function beginDrawing(event: PointerEvent): void {
     ? "one finger draws · two fingers orbit · pinch zooms"
     : "Drag to draw · wheel zooms · release to decompose";
   updateInspector();
+}
+
+function toggleInspector(): void {
+  const expanded = inspectorToggle.ariaExpanded !== "true";
+  inspectorToggle.ariaExpanded = String(expanded);
+  inspector.dataset.mobileExpanded = String(expanded);
 }
 
 function cancelTouchInteraction(): void {
@@ -314,7 +335,7 @@ function moveTouch(event: PointerEvent): void {
   touchPoints.set(event.pointerId, nextPoint);
   if (!touchCameraGesture.canMoveCamera() && pendingTouchId === event.pointerId && pendingTouchStart) {
     const movement = Math.hypot(nextPoint.clientX - pendingTouchStart.clientX, nextPoint.clientY - pendingTouchStart.clientY);
-    if (movement >= 6) {
+    if (movement >= touchDrawDistance()) {
       touchPoints.clear();
       touchCameraGesture.reset();
       pendingTouchId = null;
@@ -595,6 +616,7 @@ canvas.addEventListener("lostpointercapture", handleLostPointerCapture);
 canvas.addEventListener("wheel", zoomCamera, { passive: false });
 canvas.addEventListener("auxclick", preventMiddleClick);
 resetViewButton.addEventListener("click", resetView);
+inspectorToggle.addEventListener("click", toggleInspector);
 harmonicSlider.addEventListener("input", selectHarmonics);
 previousStepButton.addEventListener("click", selectPreviousHarmonics);
 nextStepButton.addEventListener("click", selectNextHarmonics);
@@ -621,6 +643,7 @@ function cleanup(): void {
   canvas.removeEventListener("wheel", zoomCamera);
   canvas.removeEventListener("auxclick", preventMiddleClick);
   resetViewButton.removeEventListener("click", resetView);
+  inspectorToggle.removeEventListener("click", toggleInspector);
   harmonicSlider.removeEventListener("input", selectHarmonics);
   previousStepButton.removeEventListener("click", selectPreviousHarmonics);
   nextStepButton.removeEventListener("click", selectNextHarmonics);
