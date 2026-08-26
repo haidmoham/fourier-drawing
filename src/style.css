@@ -39,7 +39,8 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
 .drawing-invitation .canvas-cta { position: static; width: max-content; max-width: calc(100% - 2rem); min-height: 2.8rem; margin: 0; padding: .72rem 1rem; pointer-events: auto; }
 .gesture-primer { max-width: calc(100% - 2rem); pointer-events: none; }
 .gesture-primer .gesture-guide-content { grid-template-columns: repeat(3,max-content); column-gap: .8rem; box-shadow: none; }
-.mobile-start { display: none; }
+.mobile-play { display: none; }
+.mobile-play:disabled { cursor: not-allowed; box-shadow: none; filter: saturate(.45); opacity: .48; transform: none; }
 .canvas-cta:hover,.canvas-cta:focus-visible { transform: translateY(-2px); }
 .hint { position: absolute; right: 1rem; bottom: .75rem; left: 1rem; margin: 0; color: #65767b; font: .7rem/1.4 "DM Mono",monospace; pointer-events: none; }
 .legend { position: absolute; top: .9rem; left: 1rem; display: flex; gap: .75rem; color: #607176; font: .64rem "DM Mono",monospace; pointer-events: none; }
@@ -180,8 +181,8 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
   .workspace { display: flex; flex-direction: column; align-items: stretch; min-height: 0; }
   .drawing-area { flex: 0 0 auto; height: max(24rem,calc(100svh - 15.25rem)); min-height: 0; }
   canvas { height: 100%; min-height: 0; }
-  .mobile-start { display: block; width: 100%; min-height: 3.75rem; font-size: 1rem; }
-  .mobile-start,.inspector { flex: 0 0 auto; }
+  .mobile-play { display: block; width: 100%; min-height: 3.75rem; font-size: 1rem; }
+  .mobile-play,.inspector { flex: 0 0 auto; }
   .inspector { display: block; }
   .inspector-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 3.25rem; padding: .75rem .9rem; border: 0; border-radius: 0; color: #263b40; background: transparent; box-shadow: none; font-size: .78rem; font-weight: 600; text-align: left; }
   .inspector-toggle:hover,.inspector-toggle:focus-visible { border-color: transparent; background: rgba(228,240,237,.72); transform: none; }
