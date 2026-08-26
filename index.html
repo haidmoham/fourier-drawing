@@ -3,24 +3,95 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Draw a path to prepare it for a Fourier visualization."
-    />
-    <title>Fourier Drawing</title>
+    <meta name="description" content="A spatial Fourier drawing instrument." />
+    <title>Fourier Etch-a-Sketch</title>
   </head>
   <body>
     <main class="app-shell">
       <header class="toolbar">
         <div>
-          <p class="eyebrow">Fourier drawing</p>
-          <h1>Sketch a loop</h1>
+          <button class="eyebrow draw-cta" type="button" data-draw-cta>Start drawing →</button>
+          <h1>Fourier Etch-a-Sketch</h1>
+          <p class="subtitle">Mathematics as a toy 🤓</p>
         </div>
         <button id="reset" type="button">Reset</button>
       </header>
-      <section class="drawing-area" aria-label="Drawing area">
-        <canvas id="drawing-canvas" aria-label="Draw a path with your pointer"></canvas>
-        <p id="hint" class="hint">Draw one continuous path. It will close when you release.</p>
+      <section class="workspace" aria-label="Fourier drawing instrument">
+        <div class="drawing-area">
+          <canvas id="drawing-canvas" tabindex="0" aria-describedby="hint" aria-label="Press and drag to draw a curve. Use the mouse wheel to zoom. Middle-drag to orbit around the origin."></canvas>
+          <button class="canvas-cta draw-cta" type="button" data-draw-cta>Start drawing →</button>
+          <div class="legend" aria-hidden="true"><span>reconstruction</span><span class="raw">raw path</span><span class="closure">closure gap</span></div>
+          <p id="hint" class="hint">Press and drag to draw · wheel zooms · middle-drag pivots</p>
+        </div>
+        <aside class="inspector" aria-label="Curve inspector">
+          <div class="inspector-title"><span>Curve inspector</span><span class="live-dot">● LIVE</span></div>
+          <dl class="metrics">
+            <div class="metric"><dt>Input state</dt><dd id="input-state" class="parameter-value">READY</dd></div>
+            <div class="metric"><dt>Source samples</dt><dd id="source-samples" class="parameter-value">0</dd></div>
+            <div class="metric"><dt>Resampled count</dt><dd id="resampled-count" class="parameter-value">0</dd></div>
+            <div class="metric harmonic-control">
+              <dt><label for="harmonic-slider">Harmonic pairs</label></dt>
+              <dd>
+                <output id="harmonic-count" for="harmonic-slider">—</output>
+                <input id="harmonic-slider" type="range" min="0" max="0" value="0" disabled />
+                <div class="playback-controls" aria-label="Harmonic playback controls">
+                  <button id="step-previous" type="button" disabled>Previous</button>
+                  <button id="auto-playback" type="button" disabled aria-pressed="false">Auto off</button>
+                  <button id="step-next" type="button" disabled>Next</button>
+                </div>
+              </dd>
+            </div>
+            <div class="metric resolution-control">
+              <dt><label for="resolution-slider">Periodic resolution</label></dt>
+              <dd>
+                <output id="resolution-count" for="resolution-slider">256 points</output>
+                <input id="resolution-slider" type="range" min="4" max="9" step="1" value="8" />
+              </dd>
+            </div>
+            <div class="metric"><dt>Closure gap</dt><dd id="closure-gap" class="parameter-value closure-value">—</dd></div>
+            <div class="metric"><dt>Normalized RMS error</dt><dd id="rms-error" class="parameter-value error-value">—</dd></div>
+          </dl>
+          <section class="math-panel" aria-labelledby="math-panel-title">
+            <h2 id="math-panel-title">Live mathematics</h2>
+            <div class="math-color-key" aria-label="Mathematical color key">
+              <span class="raw-object">p · raw</span>
+              <span class="reconstruction-object">p̂ · reconstruction</span>
+              <span class="residual-object">p̂ − p · residual</span>
+            </div>
+            <div class="parameter-strip" aria-label="Current Fourier parameters">
+              <div class="parameter-chip harmonic-parameter"><span>M · pairs</span><strong id="math-harmonic-value">—</strong></div>
+              <div class="parameter-chip resolution-parameter"><span>N · samples</span><strong id="math-resolution-value">—</strong></div>
+              <div class="parameter-chip closure-parameter"><span>g · closure</span><strong id="math-closure-value">—</strong></div>
+              <div class="parameter-chip error-parameter"><span>NRMSE</span><strong id="math-error-value">—</strong></div>
+            </div>
+            <details class="math-details">
+              <summary>Inspect the derivations</summary>
+              <div class="math-detail-content">
+                <p class="math-label">Closure between start and final point</p>
+                <div id="closure-formula" class="math-formula" aria-live="polite"></div>
+                <div class="axis-terms" aria-label="Closure vector components">
+                  <span class="axis-x">Δx <strong id="closure-delta-x">—</strong></span>
+                  <span class="axis-y">Δy <strong id="closure-delta-y">—</strong></span>
+                  <span class="axis-z">Δz <strong id="closure-delta-z">—</strong></span>
+                </div>
+                <p class="math-label">Periodic reconstruction</p>
+                <div id="periodic-formula" class="math-formula" aria-live="polite"></div>
+                <p class="math-label">Normalized RMS error derivation</p>
+                <div id="rms-formula" class="math-formula" aria-live="polite"></div>
+                <div class="energy-breakdown" aria-label="Axis contributions to RMS energy">
+                  <div><span>Error energy</span><strong class="axis-x" id="rms-error-x">—</strong><strong class="axis-y" id="rms-error-y">—</strong><strong class="axis-z" id="rms-error-z">—</strong></div>
+                  <div><span>Reference energy</span><strong class="axis-x" id="rms-reference-x">—</strong><strong class="axis-y" id="rms-reference-y">—</strong><strong class="axis-z" id="rms-reference-z">—</strong></div>
+                </div>
+                <dl class="math-terms">
+                  <div><dt>Squared error sum</dt><dd id="rms-error-sum">—</dd></div>
+                  <div><dt>Reference energy</dt><dd id="rms-reference-sum">—</dd></div>
+                  <div><dt>Periodic samples</dt><dd id="rms-sample-count">—</dd></div>
+                </dl>
+              </div>
+            </details>
+          </section>
+          <p class="note">Use the arrows or slider to step through harmonic pairs in powers of two. Auto mode loops instead! Use the wheel to zoom and middle-drag to orbit.</p>
+        </aside>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

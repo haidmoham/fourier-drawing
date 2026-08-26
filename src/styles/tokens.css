@@ -1,0 +1,11 @@
+:root {
+  --color-axis-x: #ff7f6e;
+  --color-axis-y: #7de08a;
+  --color-axis-z: #73a7ff;
+  --color-closure: #f5d76e;
+  --color-raw: #f0c27b;
+  --color-reconstruction: #6ed8ce;
+  --color-residual: #ff9fc5;
+  --color-surface: #080d12;
+  --color-text: #e8ede9;
+}
