@@ -260,6 +260,9 @@ function toggleInspector(): void {
 }
 
 function handleMobileStart(): void {
+  if (state === "DRAWING") {
+    return;
+  }
   if (state !== "HARMONICS" || !analysis) {
     inviteDrawing();
     return;

@@ -177,10 +177,11 @@ canvas:focus-visible,canvas[data-awaiting-draw="true"] { outline: 2px solid rgba
 .video-index { color: var(--color-reconstruction); font: 500 .52rem "DM Mono",monospace; }
 .resource-list a:hover,.resource-list a:focus-visible,.video-list a:hover,.video-list a:focus-visible { border-color: var(--color-reconstruction); color: #0d6267; background: rgba(228,240,237,.7); outline: none; transform: translateY(-1px); }
 @media (max-width: 760px) {
-  .workspace { display: flex; flex-direction: column; min-height: 0; }
+  .workspace { display: flex; flex-direction: column; align-items: stretch; min-height: 0; }
   .drawing-area { flex: 0 0 auto; height: max(24rem,calc(100svh - 15.25rem)); min-height: 0; }
   canvas { height: 100%; min-height: 0; }
   .mobile-start { display: block; width: 100%; min-height: 3.75rem; font-size: 1rem; }
+  .mobile-start,.inspector { flex: 0 0 auto; }
   .inspector { display: block; }
   .inspector-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 3.25rem; padding: .75rem .9rem; border: 0; border-radius: 0; color: #263b40; background: transparent; box-shadow: none; font-size: .78rem; font-weight: 600; text-align: left; }
   .inspector-toggle:hover,.inspector-toggle:focus-visible { border-color: transparent; background: rgba(228,240,237,.72); transform: none; }
