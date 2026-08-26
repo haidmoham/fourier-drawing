@@ -6,11 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "lint": "oxlint --config .oxlintrc.json .",
     "test": "vitest run"
   },
   "devDependencies": {
+    "@oxlint/plugins": "^1.80.0",
+    "@types/three": "^0.185.4",
+    "oxlint": "^1.80.0",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "katex": "^0.18.4",
+    "three": "^0.185.1"
   }
 }
