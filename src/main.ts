@@ -269,7 +269,7 @@ function handleMobileStart(): void {
   }
   setInspectorExpanded(true);
   if (!playback.snapshot().isAuto) {
-    toggleAutomaticPlayback();
+    startAutomaticPlayback(true);
   }
   requestAnimationFrame(() => inspector.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
@@ -544,19 +544,34 @@ function selectNextHarmonics(): void {
   stepHarmonics(1);
 }
 
-function toggleAutomaticPlayback(): void {
+function prepareAutomaticPlayback(): boolean {
   if (state !== "HARMONICS" || !analysis) {
-    return;
+    return false;
   }
-  const isStartingAuto = !playback.snapshot().isAuto;
-  if (isStartingAuto && harmonicMaximum() < MINIMUM_AUTO_HARMONIC_PAIRS) {
+  if (harmonicMaximum() < MINIMUM_AUTO_HARMONIC_PAIRS) {
     periodicResolution = Math.max(periodicResolution, MINIMUM_AUTO_SAMPLE_COUNT);
     resolutionSlider.value = String(Math.log2(periodicResolution));
     updateAnalysisFromSamples();
   }
-  playback.toggleAuto(performance.now());
-  syncHarmonicControl();
-  updateInspector();
+  return true;
+}
+
+function startAutomaticPlayback(advanceFromZero = false): void {
+  if (!prepareAutomaticPlayback()) {
+    return;
+  }
+  playback.startAuto(performance.now(), advanceFromZero);
+  applyPlaybackState();
+}
+
+function toggleAutomaticPlayback(): void {
+  if (playback.snapshot().isAuto) {
+    playback.stopAuto();
+    syncHarmonicControl();
+    updateInspector();
+    return;
+  }
+  startAutomaticPlayback();
 }
 
 function selectPeriodicResolution(): void {

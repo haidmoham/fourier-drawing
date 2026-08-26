@@ -33,7 +33,18 @@ export class HarmonicPlayback {
   }
 
   public toggleAuto(now: number): void {
-    this.isAuto = !this.isAuto;
+    if (this.isAuto) {
+      this.isAuto = false;
+      return;
+    }
+    this.startAuto(now);
+  }
+
+  public startAuto(now: number, advanceFromZero = false): void {
+    if (advanceFromZero && this.stepIndex === 0 && this.steps.length > 1) {
+      this.stepIndex = 1;
+    }
+    this.isAuto = true;
     this.automaticStepStartedAt = now;
   }
 

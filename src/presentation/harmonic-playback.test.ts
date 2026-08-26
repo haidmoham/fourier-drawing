@@ -18,4 +18,16 @@ describe("harmonic playback", () => {
     playback.select(4);
     expect(playback.snapshot()).toMatchObject({ harmonicPairs: 8, isAuto: false });
   });
+
+  it("can start auto playback on the first visible harmonic", () => {
+    const playback = new HarmonicPlayback(1_800);
+    playback.reset(16, 0);
+
+    playback.startAuto(1_000, true);
+
+    expect(playback.snapshot()).toMatchObject({ harmonicPairs: 1, isAuto: true });
+    expect(playback.tick(2_799)).toBe(false);
+    expect(playback.tick(2_800)).toBe(true);
+    expect(playback.snapshot().harmonicPairs).toBe(2);
+  });
 });
