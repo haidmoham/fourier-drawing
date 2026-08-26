@@ -19,7 +19,35 @@
       <section class="workspace" aria-label="Fourier drawing instrument">
         <div class="drawing-area">
           <canvas id="drawing-canvas" tabindex="0" aria-describedby="hint" aria-label="Press and drag to draw a curve. Use the mouse wheel to zoom. Middle-drag to orbit around the origin."></canvas>
-          <button class="canvas-cta draw-cta" type="button" data-draw-cta>Start drawing →</button>
+          <div class="stage-controls" aria-label="camera controls">
+            <button id="reset-view" class="stage-control" type="button" aria-label="reset view" title="reset view">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5A7 7 0 1 1 5 14M6.5 5.5v4h4"></path></svg>
+            </button>
+            <details class="stage-guide">
+              <summary aria-label="show gesture guide" title="show gesture guide">?</summary>
+              <div class="gesture-guide-content">
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3-3m-3 3-3-3M8 7.5V6a2 2 0 0 1 4 0v1.5M16 7.5V6a2 2 0 0 0-4 0v1.5"></path></svg><span>one finger draws</span></div>
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v8m8-8v8M5 10l3 3 3-3m2 0 3 3 3-3"></path></svg><span>two fingers orbit</span></div>
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7-3-3m0 0v3m0-3h3m13 13-3-3m3 3h-3m3 0v-3"></path></svg><span>pinch zooms</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v11m0 0 3-3m-3 3-3-3M11 8V6a2 2 0 0 0-4 0v2"></path></svg><span>drag draws</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-3-3 3 3-3 3M8 6v12"></path></svg><span>middle-drag orbits</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8m-8 4h8m-8 4h8"></path></svg><span>wheel zooms</span></div>
+              </div>
+            </details>
+          </div>
+          <div class="drawing-invitation">
+            <button class="canvas-cta draw-cta" type="button" data-draw-cta>Start drawing →</button>
+            <div class="gesture-primer" aria-label="gesture guide">
+              <div class="gesture-guide-content">
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10m0 0 3-3m-3 3-3-3M8 7.5V6a2 2 0 0 1 4 0v1.5M16 7.5V6a2 2 0 0 0-4 0v1.5"></path></svg><span>one finger draws</span></div>
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v8m8-8v8M5 10l3 3 3-3m2 0 3 3 3-3"></path></svg><span>two fingers orbit</span></div>
+                <div class="gesture-instruction touch-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7-3-3m0 0v3m0-3h3m13 13-3-3m3 3h-3m3 0v-3"></path></svg><span>pinch zooms</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v11m0 0 3-3m-3 3-3-3M11 8V6a2 2 0 0 0-4 0v2"></path></svg><span>drag draws</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-3-3 3 3-3 3M8 6v12"></path></svg><span>middle-drag orbits</span></div>
+                <div class="gesture-instruction fine-instruction"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8m-8 4h8m-8 4h8"></path></svg><span>wheel zooms</span></div>
+              </div>
+            </div>
+          </div>
           <div class="legend" aria-hidden="true"><span>reconstruction</span><span class="raw">raw path</span><span class="closure">closure gap</span></div>
           <details id="harmonic-envelope" class="harmonic-envelope" hidden>
             <summary>discover sine + cosine →</summary>
@@ -49,6 +77,7 @@
           </details>
           <p id="hint" class="hint">Press and drag to draw · wheel zooms · middle-drag pivots</p>
         </div>
+        <button class="mobile-start draw-cta" type="button" data-draw-cta>Start</button>
         <aside class="inspector" aria-label="Curve inspector">
           <div class="inspector-title"><span>Curve inspector</span><span class="live-dot">● LIVE</span></div>
           <dl class="metrics">

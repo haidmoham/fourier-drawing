@@ -3,6 +3,8 @@ import * as THREE from "three";
 export class OrbitCameraController {
   private readonly target = new THREE.Vector3();
   private readonly orbit: THREE.Spherical;
+  private readonly initialOrbit: THREE.Spherical;
+  private readonly initialDistance: number;
   private distance: number;
   private pointerId: number | null = null;
   private previousX = 0;
@@ -18,6 +20,8 @@ export class OrbitCameraController {
   ) {
     this.distance = initialPosition.length();
     this.orbit = new THREE.Spherical().setFromVector3(initialPosition);
+    this.initialOrbit = this.orbit.clone();
+    this.initialDistance = this.distance;
     this.updateCamera();
   }
 
@@ -29,6 +33,10 @@ export class OrbitCameraController {
 
   public ownsPointer(pointerId: number): boolean {
     return pointerId === this.pointerId;
+  }
+
+  public activePointerId(): number | null {
+    return this.pointerId;
   }
 
   public move(pointerId: number, clientX: number, clientY: number): boolean {
@@ -55,6 +63,13 @@ export class OrbitCameraController {
 
   public cancel(): void {
     this.pointerId = null;
+  }
+
+  public reset(): void {
+    this.pointerId = null;
+    this.distance = this.initialDistance;
+    this.orbit.copy(this.initialOrbit);
+    this.updateCamera();
   }
 
   public zoom(deltaY: number): void {
