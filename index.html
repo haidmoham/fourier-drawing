@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Draw a path to prepare it for a Fourier visualization."
+    />
+    <title>Fourier Drawing</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="toolbar">
+        <div>
+          <p class="eyebrow">Fourier drawing</p>
+          <h1>Sketch a loop</h1>
+        </div>
+        <button id="reset" type="button">Reset</button>
+      </header>
+      <section class="drawing-area" aria-label="Drawing area">
+        <canvas id="drawing-canvas" aria-label="Draw a path with your pointer"></canvas>
+        <p id="hint" class="hint">Draw one continuous path. It will close when you release.</p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
