@@ -77,7 +77,8 @@
           </details>
           <p id="hint" class="hint">Press and drag to draw · wheel zooms · middle-drag pivots</p>
         </div>
-        <button id="mobile-play" class="mobile-play draw-cta" type="button" disabled>Play</button>
+        <div class="inspector-column">
+        <button id="play" class="play draw-cta" type="button" disabled>Play</button>
         <aside class="inspector" aria-label="Curve inspector" data-mobile-expanded="false">
           <button class="inspector-toggle" type="button" aria-expanded="false" aria-controls="inspector-content">
             <span>Curve inspector</span><span class="inspector-toggle-meta"><span class="live-dot">● LIVE</span><span class="inspector-chevron" aria-hidden="true">⌄</span></span>
@@ -221,6 +222,7 @@
             <p class="note">use the arrows or slider to step through harmonic pairs in powers of two. auto mode reaches at least 128 pairs, then loops. use the wheel to zoom and middle-drag to orbit.</p>
           </div>
         </aside>
+        </div>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

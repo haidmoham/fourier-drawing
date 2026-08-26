@@ -36,14 +36,14 @@ const mathDetailsElement = document.querySelector<HTMLDetailsElement>(".math-det
 const resetViewElement = document.querySelector<HTMLButtonElement>("#reset-view");
 const inspectorElement = document.querySelector<HTMLElement>(".inspector");
 const inspectorToggleElement = document.querySelector<HTMLButtonElement>(".inspector-toggle");
-const mobilePlayElement = document.querySelector<HTMLButtonElement>("#mobile-play");
+const playButtonElement = document.querySelector<HTMLButtonElement>("#play");
 const drawingInvitationElements = [...document.querySelectorAll<HTMLButtonElement>("[data-draw-invitation]")];
 
 if (!canvasElement || !resetButtonElement || !hintElement || !inputStateElement || !sourceSamplesElement
   || !resampledCountElement || !harmonicCountElement || !closureGapElement || !rmsErrorElement
   || !harmonicSliderElement || !previousStepElement || !nextStepElement || !autoPlaybackElement
   || !resolutionSliderElement || !resolutionCountElement || !mathDetailsElement || !resetViewElement
-  || !inspectorElement || !inspectorToggleElement || !mobilePlayElement
+  || !inspectorElement || !inspectorToggleElement || !playButtonElement
   || drawingInvitationElements.length === 0) {
   throw new Error("The Fourier instrument could not be initialized.");
 }
@@ -67,7 +67,7 @@ const mathDetails = mathDetailsElement;
 const resetViewButton = resetViewElement;
 const inspector = inspectorElement;
 const inspectorToggle = inspectorToggleElement;
-const mobilePlay = mobilePlayElement;
+const playButton = playButtonElement;
 const liveMathPanel = LiveMathPanel.from(document);
 const harmonicEnvelope = HarmonicEnvelope.from(document);
 const mountElement = canvas.parentElement;
@@ -102,7 +102,7 @@ const touchCameraGesture = new TouchCameraGesture();
 let pendingTouchId: number | null = null;
 let pendingTouchStart: TouchPoint | null = null;
 let previousPinchDistance: number | null = null;
-let lastMobilePlayTouchAt = Number.NEGATIVE_INFINITY;
+let lastPlayTouchAt = Number.NEGATIVE_INFINITY;
 
 function usesCoarsePointer(): boolean {
   return window.matchMedia("(pointer: coarse)").matches;
@@ -158,7 +158,7 @@ function setResolutionCount(value: string): void {
 
 function updateInspector(): void {
   const playbackState = playback.snapshot();
-  mobilePlay.disabled = state !== "HARMONICS" || analysis === null;
+  playButton.disabled = state !== "HARMONICS" || analysis === null;
   inputState.textContent = state;
   inputState.dataset.state = state === "DRAWING" ? "active" : "idle";
   sourceSamples.textContent = String(samples.length);
@@ -261,7 +261,7 @@ function toggleInspector(): void {
   setInspectorExpanded(inspectorToggle.ariaExpanded !== "true");
 }
 
-function playMobileSequence(): void {
+function playSequence(): void {
   if (state !== "HARMONICS" || !analysis) {
     return;
   }
@@ -276,20 +276,20 @@ function playMobileSequence(): void {
   applyPlaybackState();
 }
 
-function handleMobilePlayPointerUp(event: PointerEvent): void {
+function handlePlayPointerUp(event: PointerEvent): void {
   if (event.pointerType !== "touch") {
     return;
   }
   event.preventDefault();
-  lastMobilePlayTouchAt = performance.now();
-  playMobileSequence();
+  lastPlayTouchAt = performance.now();
+  playSequence();
 }
 
-function handleMobilePlayClick(): void {
-  if (performance.now() - lastMobilePlayTouchAt < 700) {
+function handlePlayClick(): void {
+  if (performance.now() - lastPlayTouchAt < 700) {
     return;
   }
-  playMobileSequence();
+  playSequence();
 }
 
 function cancelTouchInteraction(): void {
@@ -670,8 +670,8 @@ canvas.addEventListener("wheel", zoomCamera, { passive: false });
 canvas.addEventListener("auxclick", preventMiddleClick);
 resetViewButton.addEventListener("click", resetView);
 inspectorToggle.addEventListener("click", toggleInspector);
-mobilePlay.addEventListener("pointerup", handleMobilePlayPointerUp);
-mobilePlay.addEventListener("click", handleMobilePlayClick);
+playButton.addEventListener("pointerup", handlePlayPointerUp);
+playButton.addEventListener("click", handlePlayClick);
 harmonicSlider.addEventListener("input", selectHarmonics);
 previousStepButton.addEventListener("click", selectPreviousHarmonics);
 nextStepButton.addEventListener("click", selectNextHarmonics);
@@ -699,8 +699,8 @@ function cleanup(): void {
   canvas.removeEventListener("auxclick", preventMiddleClick);
   resetViewButton.removeEventListener("click", resetView);
   inspectorToggle.removeEventListener("click", toggleInspector);
-  mobilePlay.removeEventListener("pointerup", handleMobilePlayPointerUp);
-  mobilePlay.removeEventListener("click", handleMobilePlayClick);
+  playButton.removeEventListener("pointerup", handlePlayPointerUp);
+  playButton.removeEventListener("click", handlePlayClick);
   harmonicSlider.removeEventListener("input", selectHarmonics);
   previousStepButton.removeEventListener("click", selectPreviousHarmonics);
   nextStepButton.removeEventListener("click", selectNextHarmonics);
