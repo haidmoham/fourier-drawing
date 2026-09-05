@@ -1,22 +1,33 @@
 # Fourier Drawing
 
-Fourier Drawing is a small Three.js instrument for exploring how a continuous spatial curve becomes a harmonic reconstruction.
+Draw a line and explore the rotating components that reconstruct it. This local reimagining puts the Fourier sum on the stage: a paper drawing surface sits beside a view of its epicycles, with synchronized points connecting the two.
 
-Press and drag on the stage to draw. Release to enter the harmonics phase. Press the stage to return to drawing from the last curve point. Use the wheel to move the camera along its current viewing axis. Middle-drag to orbit the camera around the origin. Each drawing phase captures a camera-facing sketch plane through the last curve point. Pivot before continuing to extend the curve through a new spatial plane. The harmonics phase starts at the DC term and exposes checkpoints at 1, 2, 4, 8, and subsequent powers of two. Use the arrows or indexed slider to step manually. Auto mode loops through the same checkpoints. The periodic-resolution control recomputes the DFT samples, reconstruction, and live normalized RMS terms. The dashed segment is the explicit periodic seam used by the reconstruction. The raw hand path remains stable while playback controls the visually loud Fourier overlay.
+## Use
 
-The inspector reports input state, source and resampled counts, harmonic-pair count, closure gap, and normalized reconstruction error. Reset clears the only curve and starts a fresh run.
+Choose **draw your own** and drag in **your curve**, then release to see the reconstruction. Or start with a bloom, orbit, or heart. Change the number of waves, pause playback, or scrub the loop. Select one of the first six wave graphs to highlight its circle in the sum.
 
-The interface asks for a drawing before it presents the derivations. Its visible color layer maps amber to raw samples, cyan to reconstruction, pink to residual error, yellow to closure, and coral/green/blue to the x/y/z components. Detailed closure and normalized RMS derivations remain behind an explicit disclosure control.
+The curve is resampled at 256 equally spaced arc-length positions, including the closing segment for an open stroke. A complex discrete Fourier transform decomposes x + iy into rotating terms. The center position is always included; remaining terms are added in descending amplitude order. The error readout is RMS reconstruction distance divided by the centered source RMS radius. Full reconstruction matches the sampled positions to floating-point precision, rather than promising an exact fit to every point of the original hand stroke.
 
-## Run locally
+## Run
 
 ```sh
 npm install
-npm run dev
+npm run dev -- --host 127.0.0.1 --port 5174
 ```
 
-Run the existing tests with `npm test` and create a production build with `npm run build`.
+```sh
+npm test
+npm run build
+npm run lint
+```
 
-`src/presentation/domain-adapter.ts` is a renderer-facing compatibility facade over the renderer-independent `src/domain` API. It keeps Three.js types out of the domain contract. Camera orbit, harmonic playback, and KaTeX rendering live in separate presentation modules so `src/main.ts` remains the composition layer.
+## Structure
 
-Start visual prototypes in `src/styles/tokens.css` for interface colors and `src/presentation/visual-palette.ts` for Three.js and KaTeX colors. The separate files make palette experiments local and keep the mathematical color mapping consistent across CSS, rendered formulas, and the 3D scene.
+- `src/reimagined/engine.ts`: pure complex Fourier mathematics and sample curves.
+- `src/reimagined/instrument.ts`: canvas drawing, cumulative vectors, playback, and cached reconstruction analysis.
+- `src/reimagined/main.ts`: typed DOM controls and harmonic graphs.
+- `src/reimagined/style.css`: responsive visual design.
+
+The previous 3D domain and presentation modules remain in the repository, but the page entrypoint uses the 2D instrument. TypeScript interfaces describe points and state during checking; they disappear from the browser bundle. Canvas drawing and event listeners are runtime browser APIs.
+
+Reduced-motion preference starts the instrument paused. Touch and mouse drawing use pointer capture. On narrow screens the two canvas views stack vertically. The typefaces load from Google Fonts with local fallbacks.
