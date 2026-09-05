@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6efe4" />
+    <meta name="description" content="A watercolor bouquet in warm autumn light." />
+    <title>flowers</title>
+  </head>
+  <body>
+    <main id="bouquet" aria-label="an animated watercolor bouquet"></main>
+    <div class="evening-light" aria-hidden="true"></div>
+    <div class="window-shadow" aria-hidden="true"></div>
+    <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="turn on evening piano"><span aria-hidden="true">♫</span></button>
+    <div class="modes" role="group" aria-label="animation mode">
+      <button data-mode="bloom" aria-label="bloom animation" aria-pressed="true">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><g class="petals"><ellipse cx="14" cy="9" rx="3.6" ry="6"/><ellipse cx="14" cy="9" rx="3.6" ry="6" transform="rotate(60 14 14)"/><ellipse cx="14" cy="9" rx="3.6" ry="6" transform="rotate(120 14 14)"/><ellipse cx="14" cy="9" rx="3.6" ry="6" transform="rotate(180 14 14)"/><ellipse cx="14" cy="9" rx="3.6" ry="6" transform="rotate(240 14 14)"/><ellipse cx="14" cy="9" rx="3.6" ry="6" transform="rotate(300 14 14)"/></g><circle cx="14" cy="14" r="1.3" fill="currentColor"/></svg>
+      </button>
+      <button data-mode="ripple" aria-label="ripple animation" aria-pressed="false">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width=".75"><circle cx="14" cy="14" r="9"/><circle cx="14" cy="14" r="6"/><circle cx="14" cy="14" r="2.5"/></g></svg>
+      </button>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

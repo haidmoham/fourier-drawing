@@ -1,0 +1,9 @@
+{
+  "name": "fourier-drawing-newflowers",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": { "dev": "vite --host 127.0.0.1 --port 4190", "build": "tsc && vite build" },
+  "dependencies": { "p5": "1.11.3" },
+  "devDependencies": { "@types/p5": "1.7.6", "typescript": "~5.8.3", "vite": "^7.0.0" }
+}
