@@ -17,10 +17,12 @@ const status = element<HTMLParagraphElement>('#status');
 const colors = ['#e85835', '#4774bf', '#829143', '#9874ad', '#bb8b3d', '#429587'];
 let lastSignature = '';
 let currentState: InstrumentState | null = null;
-let drawingMode = false;
+let drawingMode = true;
 
 function update(state: InstrumentState): void {
   currentState = state;
+  document.body.dataset.state = state.hasDrawing ? "drawn" : "empty";
+  document.body.classList.toggle("is-drawing", state.drawing);
   const rotating = Math.max(0, state.terms - 1);
   terms.max = String(Math.max(0, state.maxTerms - 1));
   terms.value = String(rotating);
@@ -83,6 +85,7 @@ function renderCards(state: InstrumentState): void {
 }
 
 const instrument = new Instrument(canvas, update);
+setMode(true);
 function setMode(draw: boolean): void {
   drawingMode = draw;
   instrument.setMode(draw ? 'draw' : 'explore');

@@ -76,11 +76,7 @@ export class Instrument {
     canvas.addEventListener("pointercancel", this.onPointerUp);
     window.addEventListener("resize", this.onWindowResize);
     this.resize();
-    this.loadExample("flower");
-    if (!this.media.matches) {
-      this.playing = true;
-      this.startAnimation();
-    }
+    this.clear();
   }
 
   public setTerms(count: number): void {
@@ -288,11 +284,15 @@ export class Instrument {
     ctx.fillRect(0, 0, this.width, this.height);
     const [sourcePanel, sumPanel] = this.panels();
     this.drawSource(sourcePanel);
-    this.drawChain(sumPanel);
+    if (this.source.length) this.drawChain(sumPanel);
     this.drawEndpointBridge(sourcePanel, sumPanel);
   }
 
   private panels(): [Panel, Panel] {
+    if (!this.source.length) {
+      const whole = { x: 14, y: 14, width: Math.max(1, this.width - 28), height: Math.max(1, this.height - 28) };
+      return [whole, whole];
+    }
     const inset = this.width >= 650 ? 18 : 14;
     const gap = this.width >= 650 ? 18 : 14;
     if (this.width >= 650) {
@@ -311,15 +311,17 @@ export class Instrument {
 
   private drawSource(panel: Panel): void {
     const ctx = this.context;
-    this.drawPanelGround(panel, "your curve");
+    this.drawPanelGround(panel, this.source.length ? "your curve" : "");
     const scale = this.curveScale(panel);
     if (!this.source.length && !this.drawing) {
       ctx.fillStyle = "rgba(37,34,30,.56)";
-      ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+      ctx.font = `italic ${Math.min(86, panel.width * .13)}px "DM Serif Display", Georgia, serif`;
+      ctx.fillStyle = "#e34c29";
       ctx.textAlign = "center";
-      ctx.fillText("draw a gesture here", panel.x + panel.width / 2, panel.y + panel.height / 2 - 3);
+      ctx.fillText("draw on me.", panel.x + panel.width / 2, panel.y + panel.height / 2 - 3);
       ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, monospace";
-      ctx.fillText("the seam is part of the signal", panel.x + panel.width / 2, panel.y + panel.height / 2 + 18);
+      ctx.fillStyle = "#77786c";
+      ctx.fillText("press, drag, let go.", panel.x + panel.width / 2, panel.y + panel.height / 2 + 30);
       return;
     }
     if (this.source.length) {
