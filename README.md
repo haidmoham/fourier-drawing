@@ -4,7 +4,7 @@ Draw a line and explore the rotating components that reconstruct it. This local 
 
 ## Use
 
-Press and drag on the opening canvas, then release to reveal the reconstruction and wave controls. Choose **draw** for another stroke, or try a bloom, orbit, or heart. Clear returns to the blank canvas. Change the number of waves, pause playback, or scrub the loop. Select one of the first six wave graphs to highlight its circle in the sum.
+Press and drag on the opening canvas, then release to reveal the reconstruction and wave controls. Choose **draw** for another stroke, or try a bloom, orbit, or heart. Clear returns to the blank canvas. Change the number of waves, pause playback, or scrub the loop. Select a circle directly or one of the first six wave graphs to inspect its radius, frequency, starting angle, live x/y projection, and partial addition into the complete tracing point. The first wave is selected after drawing.
 
 The curve is resampled at 256 equally spaced arc-length positions, including the closing segment for an open stroke. A complex discrete Fourier transform decomposes x + iy into rotating terms. The center position is always included; remaining terms are added in descending amplitude order. The error readout is RMS reconstruction distance divided by the centered source RMS radius. Full reconstruction matches the sampled positions to floating-point precision, rather than promising an exact fit to every point of the original hand stroke.
 

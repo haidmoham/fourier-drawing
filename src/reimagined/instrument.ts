@@ -125,7 +125,7 @@ export class Instrument {
     this.analyzeSource();
     this.terms = this.clampTerms(6);
     this.cacheApproximation();
-    this.selected = null;
+    this.selected = this.terms > 1 ? 1 : 0;
     this.render();
     this.emit();
   }
@@ -188,7 +188,16 @@ export class Instrument {
   }
 
   private beginStroke(event: PointerEvent): void {
-    if (event.button !== 0 || this.drawing || this.mode !== "draw" || !this.inSourcePanel(event)) return;
+    if (event.button !== 0 || this.drawing) return;
+    if (this.mode === "explore") {
+      if (this.selectFromPointer(event)) {
+        event.preventDefault();
+        this.render();
+        this.emit();
+      }
+      return;
+    }
+    if (this.mode !== "draw" || !this.inSourcePanel(event)) return;
     event.preventDefault();
     this.playing = false;
     this.drawing = true;
@@ -221,7 +230,7 @@ export class Instrument {
       this.terms = this.clampTerms(6);
       this.cacheApproximation();
       this.phase = 0;
-      this.selected = null;
+      this.selected = this.terms > 1 ? 1 : 0;
       this.mode = "explore";
       if (!this.media.matches) {
         this.playing = true;
@@ -364,7 +373,7 @@ export class Instrument {
       const harmonic = this.harmonics[index];
       const color = COLORS[index % COLORS.length];
       const focus = this.selected === null || this.selected === index;
-      const alpha = focus ? 0.94 : 0.16;
+      const alpha = focus ? 0.96 : 0.35;
       const origin = { x: center.x + start.x * scale, y: center.y - start.y * scale };
       const point = { x: center.x + end.x * scale, y: center.y - end.y * scale };
       if (harmonic.frequency !== 0) {
@@ -374,6 +383,7 @@ export class Instrument {
         ctx.arc(origin.x, origin.y, harmonic.amplitude * scale, 0, TAU);
         ctx.stroke();
       }
+      if (this.selected === index) this.drawProjectionLegs(origin, point, panel, color);
       ctx.strokeStyle = withAlpha(color, alpha);
       ctx.lineWidth = focus ? 2.15 : 1.15;
       ctx.beginPath();
@@ -430,6 +440,30 @@ export class Instrument {
     ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, monospace";
     ctx.textAlign = "left";
     ctx.fillText(label, panel.x + 12, panel.y + 19);
+  }
+
+  private drawProjectionLegs(origin: Point, point: Point, panel: Panel, color: string): void {
+    const ctx = this.context;
+    const corner = { x: point.x, y: origin.y };
+    ctx.strokeStyle = withAlpha(color, .82);
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    ctx.moveTo(origin.x, origin.y);
+    ctx.lineTo(corner.x, corner.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = withAlpha(color, .98);
+    ctx.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.textAlign = "center";
+    const horizontalLabelY = origin.y > panel.y + 23 ? origin.y - 7 : origin.y + 14;
+    ctx.fillText("Δx", clamp((origin.x + point.x) / 2, panel.x + 12, panel.x + panel.width - 12), clamp(horizontalLabelY, panel.y + 12, panel.y + panel.height - 10));
+    const rightSide = point.x < panel.x + panel.width - 29;
+    ctx.textAlign = rightSide ? "left" : "right";
+    const verticalLabelX = clamp(point.x + (rightSide ? 7 : -7), panel.x + 8, panel.x + panel.width - 8);
+    const verticalLabelY = clamp((origin.y + point.y) / 2, panel.y + 12, panel.y + panel.height - 10);
+    ctx.fillText("Δy", verticalLabelX, verticalLabelY);
   }
 
   private strokePath(points: readonly Point[], panel: Panel, scale: number, color: string, width: number): void {
@@ -546,6 +580,38 @@ export class Instrument {
     return x >= panel.x && x <= panel.x + panel.width && y >= panel.y && y <= panel.y + panel.height;
   }
 
+  private selectFromPointer(event: PointerEvent): boolean {
+    if (!this.source.length || !this.harmonics.length || !this.terms) return false;
+    const bounds = this.canvas.getBoundingClientRect();
+    const [, panel] = this.panels();
+    const pointer = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    if (!inside(pointer, panel)) return false;
+    const center = { x: panel.x + panel.width / 2, y: panel.y + panel.height / 2 };
+    const endpoints = chain(this.harmonics, this.terms, this.phase);
+    const scale = this.chainScale(panel);
+    let candidate: number | null = null;
+    let nearest = 12;
+    for (let index = 0; index < this.terms; index += 1) {
+      const start = endpoints[index];
+      const end = endpoints[index + 1];
+      const origin = { x: center.x + start.x * scale, y: center.y - start.y * scale };
+      const point = { x: center.x + end.x * scale, y: center.y - end.y * scale };
+      const tipDistance = Math.hypot(pointer.x - point.x, pointer.y - point.y);
+      let distance = tipDistance;
+      if (this.harmonics[index].frequency !== 0) {
+        const ringDistance = Math.abs(Math.hypot(pointer.x - origin.x, pointer.y - origin.y) - this.harmonics[index].amplitude * scale);
+        distance = Math.min(distance, ringDistance);
+      }
+      if (distance <= nearest) {
+        nearest = distance;
+        candidate = index;
+      }
+    }
+    if (candidate === null) return false;
+    this.selected = this.selected === candidate ? null : candidate;
+    return true;
+  }
+
   private clampTerms(count: number): number {
     if (!this.harmonics.length) return 0;
     return Math.min(this.harmonics.length, Math.max(1, Math.round(Number.isFinite(count) ? count : 1)));
@@ -554,6 +620,14 @@ export class Instrument {
 
 function project(point: Point, panel: Panel, scale: number): Point {
   return { x: panel.x + panel.width / 2 + point.x * scale, y: panel.y + panel.height / 2 - point.y * scale };
+}
+
+function inside(point: Point, panel: Panel): boolean {
+  return point.x >= panel.x && point.x <= panel.x + panel.width && point.y >= panel.y && point.y <= panel.y + panel.height;
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
 }
 
 function normalize(points: readonly Point[]): Point[] {

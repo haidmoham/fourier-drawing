@@ -1,4 +1,5 @@
 import './style.css';
+import { updateAnatomy } from './wave-anatomy';
 import { Instrument, type InstrumentState } from './instrument';
 
 function element<T extends HTMLElement>(selector: string): T {
@@ -11,6 +12,7 @@ const terms = element<HTMLInputElement>('#terms');
 const phase = element<HTMLInputElement>('#phase');
 const play = element<HTMLButtonElement>('#play');
 const cards = element<HTMLDivElement>('#wave-cards');
+const anatomy = element<HTMLDivElement>('#wave-anatomy');
 const drawButton = element<HTMLButtonElement>('#draw');
 const exploreButton = element<HTMLButtonElement>('#explore');
 const status = element<HTMLParagraphElement>('#status');
@@ -21,6 +23,7 @@ let drawingMode = true;
 
 function update(state: InstrumentState): void {
   currentState = state;
+  updateAnatomy(anatomy, state);
   document.body.dataset.state = state.hasDrawing ? "drawn" : "empty";
   document.body.classList.toggle("is-drawing", state.drawing);
   const rotating = Math.max(0, state.terms - 1);
@@ -78,7 +81,7 @@ function renderCards(state: InstrumentState): void {
       const y = 30 - (harmonic.amplitude ? value / harmonic.amplitude : 0) * 19;
       return `${i ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`;
     }).join(' ');
-    button.innerHTML = `<div class="wave-meta"><span>wave ${String(index).padStart(2, '0')}</span><span>${harmonic.frequency > 0 ? '+' : ''}${harmonic.frequency} ↻</span></div><svg viewBox="0 0 160 60" aria-hidden="true"><path d="M0 30H160" stroke="#d9d7cc" fill="none"/><path d="${path}" stroke="${colors[offset % colors.length]}" stroke-width="1.6" fill="none"/><circle data-wave-dot="${index}" cx="2" cy="30" r="3" fill="${colors[offset % colors.length]}"/></svg><span class="wave-detail">radius ${harmonic.amplitude.toFixed(3)} · ${index < state.terms ? 'follow ↗' : 'add more waves'}</span>`;
+    button.innerHTML = `<div class="wave-meta"><span>wave ${String(index).padStart(2, '0')}</span><span>${harmonic.frequency > 0 ? '+' : ''}${harmonic.frequency} ${harmonic.frequency > 0 ? '↺' : '↻'}</span></div><svg viewBox="0 0 160 60" aria-hidden="true"><path d="M0 30H160" stroke="#d9d7cc" fill="none"/><path d="${path}" stroke="${colors[offset % colors.length]}" stroke-width="1.6" fill="none"/><circle data-wave-dot="${index}" cx="2" cy="30" r="3" fill="${colors[offset % colors.length]}"/></svg><span class="wave-detail">radius ${harmonic.amplitude.toFixed(3)} · ${index < state.terms ? 'follow ↗' : 'add more waves'}</span>`;
     button.addEventListener('click', () => instrument.setSelected(currentState?.selected === index ? null : index));
     cards.append(button);
   });
