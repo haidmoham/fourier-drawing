@@ -52,6 +52,10 @@ click. It stops when switched off and pauses when the tab is hidden. Audio lives
 in `src/evening.ts`. The p5 sketch owns the wordless handoff. Reduced-motion
 mode omits the handoff motion and leaf drift.
 
+Keep a visible lowercase return link to `https://shin86.dev/` at the top left.
+The link returns to the cluster hub. Keep scene controls wordless and circular.
+Use warm brown borders and paper fills to show hover, focus, press, and selection.
+
 The expanded autumn layer fills the upper frame with translucent maple foliage
 and fine branches. Ochre and rust washes surround a soft amber light. Fallen
 leaves balance the lower-right edge. The canopy is cached in the paper layer.

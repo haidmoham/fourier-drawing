@@ -20,3 +20,58 @@ button svg{width:27px;height:27px}
 .sound[aria-pressed=true]{color:#77513e}
 canvas:focus-visible{outline:1px solid #907662;outline-offset:-12px}
 @media(prefers-reduced-motion:reduce){.evening-light{transition:none}}
+
+/* Warm paper controls stay distinct from the painted scenery. */
+.cluster-return {
+  position: fixed;
+  top: calc(13px + env(safe-area-inset-top, 0px));
+  left: calc(14px + env(safe-area-inset-left, 0px));
+  z-index: 1;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #8d725c80;
+  border-radius: 22px;
+  background: #f6efe4e8;
+  color: #71523e;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+.modes, .sound { z-index: 1; }
+.modes { gap: 7px; }
+button {
+  border: 1px solid #8d725c80;
+  background: #f6efe4d9;
+  color: #715943;
+  box-shadow: 0 2px 6px #593d4d0d;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+button[aria-pressed=true] {
+  background: #e3cbb0;
+  color: #63452f;
+  border-color: #806048;
+  box-shadow: inset 0 0 0 2px #f6efe4, 0 2px 6px #593d4d14;
+}
+.petals { fill: #bf77677d; stroke: #8b5d5370; }
+@media (hover: hover) {
+  button:hover, .cluster-return:hover {
+    background: #ead8bf;
+    color: #563d2a;
+    box-shadow: 0 0 0 2px #987b5e50;
+  }
+}
+button:focus-visible, .cluster-return:focus-visible {
+  outline: 2px solid #71523e;
+  outline-offset: 3px;
+}
+button:active, .cluster-return:active {
+  background: #d8bea0;
+  box-shadow: inset 0 0 0 2px #806048;
+}
+.sound { right: calc(22px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); color: #715943; }
+@media (prefers-reduced-motion: reduce) {
+  button, .cluster-return { transition: none; }
+}
