@@ -75,3 +75,5 @@ button:active, .cluster-return:active {
 @media (prefers-reduced-motion: reduce) {
   button, .cluster-return { transition: none; }
 }
+
+.community-link { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); text-transform: none; }

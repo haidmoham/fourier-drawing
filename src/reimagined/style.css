@@ -61,3 +61,7 @@ button:disabled:active { transform: none; }
 }
 .masthead-links { display: flex; align-items: center; gap: 18px; }
 @media (max-width: 520px) { .masthead-links .edition { display: none; } }
+
+.masthead-links { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.community-link { text-transform: none; }
+@media (max-width: 600px) { .masthead { height: auto; min-height: 91px; padding-block: 16px; gap: 16px; flex-wrap: wrap; } .masthead-links { justify-content: flex-start; } }
