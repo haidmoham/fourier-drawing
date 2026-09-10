@@ -76,4 +76,4 @@ button:active, .cluster-return:active {
   button, .cluster-return { transition: none; }
 }
 
-.community-link { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); text-transform: none; }
+.community-link { top: auto; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); text-transform: none; }
