@@ -6,6 +6,7 @@
       if (!this.shadowRoot) {
         this.attachShadow({mode:'open'}).innerHTML = '<style>'+CSS+'</style><a href="https://shin86.dev/" aria-label="web design by shin86 — visit shin86.dev" title="web design by shin86">'+SVG.replace('<svg ', '<svg aria-hidden="true" focusable="false" ')+'</a><button type="button" aria-label="pause signature motion" aria-pressed="false">Ⅱ</button>';
       }
+      if (location.hostname.endsWith('.mhaider.dev')) { const link = this.shadowRoot.querySelector('a'); link.href = 'https://mhaider.dev/pocket/'; link.setAttribute('aria-label', 'back to the portfolio pocket'); link.title = 'back to pocket'; }
       let inView = false;
       let paused = false;
       const preference = matchMedia('(prefers-reduced-motion: reduce)');
