@@ -2,6 +2,8 @@
 
 Draw a line and explore the rotating components that reconstruct it. This local reimagining puts the Fourier sum on the stage: a paper drawing surface sits beside a view of its epicycles, with synchronized points connecting the two.
 
+**[Open the wave workshop](https://sketch.mhaider.dev)**
+
 ## Use
 
 Keep a visible lowercase return link to `https://shin86.dev/` in the page header.
